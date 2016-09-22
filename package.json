@@ -1,0 +1,15 @@
+{
+  "name": "db-stastic",
+  "version": "1.0.0",
+  "description": "db-stastic",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "husong",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.14.0",
+    "mongoose": "^4.6.1"
+  }
+}

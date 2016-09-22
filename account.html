@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Account</title>
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+</head>
+<body>
+<div id="app">
+    <button @click="onRefresh">refresh data</button>
+    <div>
+        <input v-model="filter" type="text">
+        <button @click="onFilter">filter</button>
+    </div>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>server_id</th>
+            <th>role_id</th>
+            <th>nickname</th>
+            <th>platform</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="item in show_data">
+            <td>{{item.server_id}}</td>
+            <td>{{item.role_id}}</td>
+            <td>{{item.nickname}}</td>
+            <td>{{item.platform}}</td>
+        </tr>
+        </tbody>
+    </table>
+    <button @click="onTotalCharge">charge total</button>
+</div>
+</body>
+<script src="static/vue.min.js"></script>
+<script src="static/vue-resource.min.js"></script>
+<script>
+    const URL_ACCOUNT = "/api/account-info";
+</script>
+<script>
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            charge_data:[],
+            show_data:[],
+            filter:""
+        },
+        ready: function() {
+            this.onRefresh();
+        },
+        methods: {
+            onRefresh: function() {
+                var _this = this;
+                this.$http.get(URL_ACCOUNT).then(function(response){
+                    _this.charge_data = response.body;
+                    _this.onFilter();
+                }, function(response){
+
+                })
+            },
+            getMoney:function(money) {
+                return parseInt(money) / 100;
+            },
+            getTime:function(time) {
+                var date = new Date(time * 1000);
+                var hour = date.getHours();
+                hour = hour < 10 ? "0" + hour: hour.toString();
+                var minutes = date.getMinutes();
+                minutes = minutes < 10? "0" + minutes : minutes.toString();
+                return hour + ":" + minutes;
+            },
+            onTotalCharge:function() {
+                var total = 0;
+                this.show_data.forEach(function(item){
+                    total += parseInt(item.money) / 100;
+                });
+                alert("total is " + total);
+            },
+            onFilter() {
+                if(this.filter == "" || this.filter == null) {
+                    this.show_data = this.charge_data;
+                    return;
+                }
+                try {
+                    var filter = JSON.parse(this.filter);
+                    console.log(filter);
+                    this.show_data = this.charge_data.filter(function(item){
+                        var condition = true;
+                        for(var k in filter) {
+                            if(item[k].toString() != filter[k].toString()) {
+                                condition = false;
+                            }
+                        }
+                        return condition
+                    });
+                }
+                catch (e) {
+                    alert("filter error");
+                    console.log(e);
+                }
+            }
+        }
+    })
+</script>
+</html>
