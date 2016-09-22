@@ -6,12 +6,14 @@
     <link rel="stylesheet" href="static/css/bootstrap.min.css">
 </head>
 <body>
-<div id="app">
+<div id="app" class="container">
     <button @click="onRefresh">refresh data</button>
     <div>
         <input v-model="filter" type="text">
         <button @click="onFilter">filter</button>
     </div>
+    <button @click="onTotalCharge">charge total</button>
+    <button @click="toAccount">toAccount</button>
     <table class="table table-bordered">
         <thead>
         <tr>
@@ -32,8 +34,6 @@
         </tr>
         </tbody>
     </table>
-    <button @click="onTotalCharge">charge total</button>
-    <button @click="toAccount">toAccount</button>
 </div>
 </body>
 <script src="static/vue.min.js"></script>

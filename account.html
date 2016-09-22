@@ -6,12 +6,14 @@
     <link rel="stylesheet" href="static/css/bootstrap.min.css">
 </head>
 <body>
-<div id="app">
+<div id="app" class="container">
     <button @click="onRefresh">refresh data</button>
     <div>
         <input v-model="filter" type="text">
         <button @click="onFilter">filter</button>
     </div>
+    <button @click="total">total</button>
+    <button @click="toCharge">toCharge</button>
     <table class="table table-bordered">
         <thead>
         <tr>
@@ -25,12 +27,11 @@
         <tr v-for="item in show_data">
             <td>{{item.server_id}}</td>
             <td>{{item.role_id}}</td>
-            <td>{{item.nickname}}</td>
+            <td style="max-width: 100px">{{item.nickname}}</td>
             <td>{{item.platform}}</td>
         </tr>
         </tbody>
     </table>
-    <button @click="onTotalCharge">charge total</button>
 </div>
 </body>
 <script src="static/vue.min.js"></script>
@@ -52,6 +53,8 @@
         methods: {
             onRefresh: function() {
                 var _this = this;
+                this.charge_data = [];
+                this.show_data = [];
                 this.$http.get(URL_ACCOUNT).then(function(response){
                     _this.charge_data = response.body;
                     _this.onFilter();
@@ -70,12 +73,8 @@
                 minutes = minutes < 10? "0" + minutes : minutes.toString();
                 return hour + ":" + minutes;
             },
-            onTotalCharge:function() {
-                var total = 0;
-                this.show_data.forEach(function(item){
-                    total += parseInt(item.money) / 100;
-                });
-                alert("total is " + total);
+            total:function() {
+                alert("total is " + this.show_data.length);
             },
             onFilter() {
                 if(this.filter == "" || this.filter == null) {
@@ -99,6 +98,9 @@
                     alert("filter error");
                     console.log(e);
                 }
+            },
+            toCharge: function() {
+                window.location.href = "/";
             }
         }
     })

@@ -80,7 +80,28 @@ app.get('/api/jg-charge', function(req, res, next) {
             res.json(data);
         });
     })
+});
 
+app.get('/api/account-info', function(req, res, next) {
+    var dbx = db.useDb('account');
+    var account = dbx.collection("account");
+    account.find({}, function(err, items) {
+        if(err) {
+            next(err);
+            return;
+        }
+        var data = [];
+        items.forEach(function(item){
+            if(item.role_id) {
+                data.push(item);
+            }
+        }, function(err) {
+            if(err) {
+                next(err);
+            }
+            res.json(data);
+        });
+    })
 });
 
 app.listen(8800);
