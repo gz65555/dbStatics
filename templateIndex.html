@@ -25,7 +25,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="inner cover">
+            <div class="inner cover" style="overflow: scroll; max-height: 600px">
                 <form onsubmit="return false;" class="form-inline" role="form" style="margin-bottom: 20px">
                     <div class="form-group">
                         <label for="inputPassword2" class="sr-only">Password</label>
@@ -33,7 +33,6 @@
                     </div>
                     <button @click="onFilter" class="btn btn-default">filter</button>
                     <button @click="onTotalCharge" class="btn btn-default">ChargeTotal</button>
-                    <button @click="onRefresh" class="btn btn-default">refresh</button>
                 </form>
                 <table class="table table-bordered table-hover">
                     <thead>
@@ -69,7 +68,7 @@
 <script src="static/vue.min.js"></script>
 <script src="static/vue-resource.min.js"></script>
 <script>
-    const CHARGE_URL = "/api/jg-charge";
+    const URL_ACCOUNT = "/api/account-info";
 </script>
 <script>
     var vm = new Vue({
@@ -85,8 +84,9 @@
         methods: {
             onRefresh: function() {
                 var _this = this;
+                this.charge_data = [];
                 this.show_data = [];
-                this.$http.get(CHARGE_URL).then(function(response){
+                this.$http.get(URL_ACCOUNT).then(function(response){
                     _this.charge_data = response.body;
                     _this.onFilter();
                 }, function(response){
@@ -104,12 +104,8 @@
                 minutes = minutes < 10? "0" + minutes : minutes.toString();
                 return hour + ":" + minutes;
             },
-            onTotalCharge:function() {
-                var total = 0;
-                this.show_data.forEach(function(item){
-                    total += parseInt(item.money) / 100;
-                });
-                alert("total is " + total);
+            total:function() {
+                alert("total is " + this.show_data.length);
             },
             onFilter() {
                 if(this.filter == "" || this.filter == null) {
@@ -134,8 +130,8 @@
                     console.log(e);
                 }
             },
-            toAccount() {
-                window.location.href = "/account"
+            toCharge: function() {
+                window.location.href = "/";
             }
         }
     })

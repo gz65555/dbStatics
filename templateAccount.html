@@ -33,7 +33,6 @@
                     </div>
                     <button @click="onFilter" class="btn btn-default">filter</button>
                     <button @click="onTotalCharge" class="btn btn-default">ChargeTotal</button>
-                    <button @click="onRefresh" class="btn btn-default">refresh</button>
                 </form>
                 <table class="table table-bordered table-hover">
                     <thead>
@@ -69,7 +68,7 @@
 <script src="static/vue.min.js"></script>
 <script src="static/vue-resource.min.js"></script>
 <script>
-    const CHARGE_URL = "/api/jg-charge";
+    const URL = "/api/jg-charge";
 </script>
 <script>
     var vm = new Vue({
@@ -86,7 +85,7 @@
             onRefresh: function() {
                 var _this = this;
                 this.show_data = [];
-                this.$http.get(CHARGE_URL).then(function(response){
+                this.$http.get(URL).then(function(response){
                     _this.charge_data = response.body;
                     _this.onFilter();
                 }, function(response){

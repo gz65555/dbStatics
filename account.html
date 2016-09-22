@@ -7,13 +7,17 @@
 </head>
 <body>
 <div id="app" class="container">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation" @click="toCharge"><a href="#">Charge</a></li>
+        <li role="presentation" class="active"><a href="#">Account</a></li>
+        <li role="presentation"><a href="#">Role</a></li>
+    </ul>
     <button @click="onRefresh">refresh data</button>
     <div>
         <input v-model="filter" type="text">
         <button @click="onFilter">filter</button>
     </div>
     <button @click="total">total</button>
-    <button @click="toCharge">toCharge</button>
     <table class="table table-bordered">
         <thead>
         <tr>
