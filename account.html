@@ -1,43 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Account</title>
-    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Cover Template for Bootstrap</title>
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="static/css/cover.css" rel="stylesheet">
 </head>
+
 <body>
-<div id="app" class="container">
-    <ul class="nav nav-pills" role="tablist">
-        <li role="presentation" @click="toCharge"><a href="#">Charge</a></li>
-        <li role="presentation" class="active"><a href="#">Account</a></li>
-        <li role="presentation"><a href="#">Role</a></li>
-    </ul>
-    <button @click="onRefresh">refresh data</button>
-    <div>
-        <input v-model="filter" type="text">
-        <button @click="onFilter">filter</button>
+
+<div id="app" class="site-wrapper">
+    <div class="site-wrapper-inner">
+        <div class="cover-container">
+            <div class="masthead clearfix">
+                <div class="inner">
+                    <h3 class="masthead-brand">Data Center</h3>
+                    <ul class="nav masthead-nav">
+                        <li @click="toCharge"><a href="#">Charge</a></li>
+                        <li class="active"><a href="#">Account</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="inner cover" style="overflow: scroll; max-height: 600px">
+                <form onsubmit="return false;" class="form-inline" role="form" style="margin-bottom: 20px">
+                    <div class="form-group">
+                        <label for="inputPassword2" class="sr-only">Password</label>
+                        <input type="text" class="form-control" id="inputPassword2" v-model="filter" placeholder="filter">
+                    </div>
+                    <button @click="onFilter" class="btn btn-default">filter</button>
+                    <button @click="total" class="btn btn-default">total</button>
+                    <button @click="onRefresh" class="btn btn-default">refresh</button>
+                </form>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>server_id</th>
+                        <th>role_id</th>
+                        <th>name</th>
+                        <th>platform</th>
+                        <th>log_time</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="item in show_data" style="cursor: pointer" @click="toDetail(item.server_id, item.role_id)">
+                        <td>{{item.server_id}}</td>
+                        <td>{{item.role_id}}</td>
+                        <td style="max-width: 100px">{{item.name}}</td>
+                        <td>{{item.platform}}</td>
+                        <td>{{formatTime(item.log_time)}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="mastfoot">
+                <div class="inner">
+                    <p>Created by <a href="#">HuSong</a>.</p>
+                </div>
+            </div>
+        </div>
     </div>
-    <button @click="total">total</button>
-    <table class="table table-bordered">
-        <thead>
-        <tr>
-            <th>server_id</th>
-            <th>role_id</th>
-            <th>nickname</th>
-            <th>platform</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="item in show_data">
-            <td>{{item.server_id}}</td>
-            <td>{{item.role_id}}</td>
-            <td style="max-width: 100px">{{item.nickname}}</td>
-            <td>{{item.platform}}</td>
-        </tr>
-        </tbody>
-    </table>
 </div>
-</body>
+<script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
+<script src="static/js/bootstrap.min.js"></script>
 <script src="static/vue.min.js"></script>
 <script src="static/vue-resource.min.js"></script>
 <script>
@@ -66,16 +94,15 @@
 
                 })
             },
-            getMoney:function(money) {
-                return parseInt(money) / 100;
-            },
-            getTime:function(time) {
+            formatTime:function(time) {
                 var date = new Date(time * 1000);
                 var hour = date.getHours();
                 hour = hour < 10 ? "0" + hour: hour.toString();
                 var minutes = date.getMinutes();
                 minutes = minutes < 10? "0" + minutes : minutes.toString();
-                return hour + ":" + minutes;
+                var month = date.getMonth() + 1;
+                var day = date.getDay();
+                return month + "-" + day + "    " + hour + ":" + minutes;
             },
             total:function() {
                 alert("total is " + this.show_data.length);
@@ -91,6 +118,7 @@
                     this.show_data = this.charge_data.filter(function(item){
                         var condition = true;
                         for(var k in filter) {
+                            console.log(item[k].toString());
                             if(item[k].toString() != filter[k].toString()) {
                                 condition = false;
                             }
@@ -105,8 +133,12 @@
             },
             toCharge: function() {
                 window.location.href = "/";
+            },
+            toDetail(server_id, role_id) {
+                window.location.href = "/templateIndex?role_id=" + role_id + "&server_id=" + server_id;
             }
         }
     })
 </script>
+</body>
 </html>

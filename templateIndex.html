@@ -20,37 +20,64 @@
                 <div class="inner">
                     <h3 class="masthead-brand">Data Center</h3>
                     <ul class="nav masthead-nav">
-                        <li class="active"><a href="#">Charge</a></li>
-                        <li><a @click="toAccount" href="#">Account</a></li>
+                        <li @click="toCharge"><a href="#">Charge</a></li>
+                        <li @click="toAccount"><a href="#">Account</a></li>
                     </ul>
                 </div>
             </div>
-            <div class="inner cover" style="overflow: scroll; max-height: 600px">
+            <div v-if="role_data" class="inner cover" style="overflow: scroll; max-height: 600px">
                 <form onsubmit="return false;" class="form-inline" role="form" style="margin-bottom: 20px">
-                    <div class="form-group">
-                        <label for="inputPassword2" class="sr-only">Password</label>
-                        <input type="text" class="form-control" id="inputPassword2" v-model="filter" placeholder="filter">
-                    </div>
-                    <button @click="onFilter" class="btn btn-default">filter</button>
-                    <button @click="onTotalCharge" class="btn btn-default">ChargeTotal</button>
+                    <button @click="onRefresh" class="btn btn-default">refresh</button>
                 </form>
-                <table class="table table-bordered table-hover">
+                <table class="table table-bordered">
+                    <caption>basic info</caption>
                     <thead>
                     <tr>
                         <th>server_id</th>
                         <th>role_id</th>
-                        <th>money</th>
-                        <th>log_date</th>
+                        <th>name</th>
+                        <th>platform</th>
                         <th>log_time</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr style="cursor: pointer" v-for="item in show_data">
-                        <td>{{item.server_id}}</td>
-                        <td>{{item.role_id}}</td>
-                        <td>{{getMoney(item.money)}}</td>
-                        <td>{{item.log_date}}</td>
-                        <td>{{getTime(item.log_time)}}</td>
+                    <tr>
+                        <td>{{role_data.role.server_id}}</td>
+                        <td>{{role_data.role.role_id}}</td>
+                        <td style="max-width: 100px">{{role_data.role.name}}</td>
+                        <td>{{role_data.role.platform}}</td>
+                        <td>{{formatTime(role_data.role.log_time)}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <table class="table table-bordered">
+                    <caption>create city</caption>
+                    <thead>
+                    <tr>
+                        <th>x</th>
+                        <th>y</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>{{role_data.create_city.x}}</td>
+                        <td>{{role_data.create_city.y}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <table class="table table-bordered">
+                    <caption>charge log</caption>
+                    <thead>
+                    <tr>
+                        <th>charge_rmb</th>
+                        <th>log_time</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="charge in role_data.charges">
+                        <td>{{charge.rmb}}</td>
+                        <td>{{formatTime(charge.log_time)}}</td>
                     </tr>
                     </tbody>
                 </table>
@@ -68,57 +95,59 @@
 <script src="static/vue.min.js"></script>
 <script src="static/vue-resource.min.js"></script>
 <script>
-    const URL_ACCOUNT = "/api/account-info";
+    const URL_ACCOUNT = "/api/role_detail";
 </script>
 <script>
     var vm = new Vue({
         el: "#app",
         data: {
-            charge_data:[],
-            show_data:[],
-            filter:""
+            role_data: null
         },
-        ready: function() {
+        ready: function () {
             this.onRefresh();
         },
         methods: {
-            onRefresh: function() {
+            onRefresh: function () {
                 var _this = this;
-                this.charge_data = [];
-                this.show_data = [];
-                this.$http.get(URL_ACCOUNT).then(function(response){
-                    _this.charge_data = response.body;
+                this.role_data = {};
+                var role_id = this.getQueryString("role_id");
+                var server_id = this.getQueryString("server_id");
+                if(role_id == null || server_id == null) {
+                    return;
+                }
+                this.$http.post(URL_ACCOUNT, {role_id:role_id, server_id:server_id}).then(function (response) {
+                    _this.role_data = response.body;
                     _this.onFilter();
-                }, function(response){
+                }, function (response) {
 
                 })
             },
-            getMoney:function(money) {
-                return parseInt(money) / 100;
-            },
-            getTime:function(time) {
+            formatTime: function (time) {
                 var date = new Date(time * 1000);
                 var hour = date.getHours();
-                hour = hour < 10 ? "0" + hour: hour.toString();
+                hour = hour < 10 ? "0" + hour : hour.toString();
                 var minutes = date.getMinutes();
-                minutes = minutes < 10? "0" + minutes : minutes.toString();
-                return hour + ":" + minutes;
+                minutes = minutes < 10 ? "0" + minutes : minutes.toString();
+                var month = date.getMonth() + 1;
+                var day = date.getDay();
+                return month + "-" + day + "    " + hour + ":" + minutes;
             },
-            total:function() {
+            total: function () {
                 alert("total is " + this.show_data.length);
             },
             onFilter() {
-                if(this.filter == "" || this.filter == null) {
+                if (this.filter == "" || this.filter == null) {
                     this.show_data = this.charge_data;
                     return;
                 }
                 try {
                     var filter = JSON.parse(this.filter);
                     console.log(filter);
-                    this.show_data = this.charge_data.filter(function(item){
+                    this.show_data = this.charge_data.filter(function (item) {
                         var condition = true;
-                        for(var k in filter) {
-                            if(item[k].toString() != filter[k].toString()) {
+                        for (var k in filter) {
+                            console.log(item[k].toString());
+                            if (item[k].toString() != filter[k].toString()) {
                                 condition = false;
                             }
                         }
@@ -130,7 +159,13 @@
                     console.log(e);
                 }
             },
-            toCharge: function() {
+            getQueryString: function (name) {
+                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+                var r = window.location.search.substr(1).match(reg);
+                if (r != null) return unescape(r[2]);
+                return null;
+            },
+            toCharge: function () {
                 window.location.href = "/";
             }
         }
