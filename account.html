@@ -101,7 +101,7 @@
                 var minutes = date.getMinutes();
                 minutes = minutes < 10? "0" + minutes : minutes.toString();
                 var month = date.getMonth() + 1;
-                var day = date.getDay();
+                var day = date.getDate();
                 return month + "-" + day + "    " + hour + ":" + minutes;
             },
             total:function() {
