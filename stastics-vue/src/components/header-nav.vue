@@ -1,41 +1,29 @@
 <template>
-  <div class="masthead clearfix">
-    <div class="inner">
-      <h3 class="masthead-brand">Data Center</h3>
-      <ul class="nav masthead-nav">
-        <li v-for="(index, item) in menuList" @click="toIndex(index)" :class="{'active': index == activeIndex}">
-          <a style="cursor: pointer">{{item}}</a>
-        </li>
-        <!--<li class="active"><a href="#">Charge</a></li>-->
-        <!--<li><a href="#">Account</a></li>-->
-      </ul>
+  <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">Statistics</a>
+      </div>
+      <!--<div id="navbar" class="navbar-collapse collapse">-->
+      <!--<ul class="nav navbar-nav navbar-right">-->
+      <!--<li><a href="#">Dashboard</a></li>-->
+      <!--<li><a href="#">Settings</a></li>-->
+      <!--<li><a href="#">Profile</a></li>-->
+      <!--<li><a href="#">Help</a></li>-->
+      <!--</ul>-->
+      <!--<form class="navbar-form navbar-right">-->
+      <!--<input type="text" class="form-control" placeholder="Search...">-->
+      <!--</form>-->
+      <!--</div>-->
     </div>
-  </div>
+  </nav>
 </template>
 <script>
-  export default{
-    data(){
-      return {
-        menuList:[
-          "Charge",
-          "Account"
-        ]
-      }
-    },
-    methods: {
-      toIndex: function (index) {
-        if(index == this.activeIndex) {
-          return;
-        }
-        if(index == 0) {
-          this.$route.router.go('/');
-        } else if(index == 1) {
-          this.$route.router.go('/account');
-          console.log('true');
-        }
-      }
-    },
-    props:["activeIndex"],
-    components: {}
-  }
 </script>

@@ -126,14 +126,13 @@ app.get('/api/account-info', function (req, res, next) {
 
 app.post('/api/role_detail', function (req, res, next) {
     var role_id = req.body.role_id;
-    var server_id = req.body.server_id;
-    if (!server_id || !role_id) {
-        return;
+    if (!role_id) {
+        return next();
     }
     var dbx = db.useDb('gm_log');
     var collection = dbx.collection("role_create");
     var role_data = {};
-    collection.findOne({role_id: parseInt(role_id), server_id: server_id.toString()}, function (err, item) {
+    collection.findOne({role_id: parseInt(role_id)}, function (err, item) {
         if (err) {
             return next(err);
         }

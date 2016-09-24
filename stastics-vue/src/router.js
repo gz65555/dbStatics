@@ -16,6 +16,12 @@ export default function (router) {
       component: function (resolve) {
         require(['./views/Account.vue'], resolve);
       }
+    },
+    '/role': {
+      name: 'role',
+      component: function (resolve) {
+        require(['./views/Role.vue'], resolve);
+      }
     }
   })
 }

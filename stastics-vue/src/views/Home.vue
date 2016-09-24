@@ -1,5 +1,6 @@
 <template>
-  <page-template active-index="0">
+  <new-template active-index="0">
+    <h2 class="sub-header">RoleCharge</h2>
     <form onsubmit="return false;" class="form-inline" role="form" style="margin-bottom: 20px">
       <div class="form-group">
         <label for="inputPassword2" class="sr-only">Password</label>
@@ -9,56 +10,58 @@
       <button @click="onTotalCharge" class="btn btn-default">ChargeTotal</button>
       <button @click="onRefresh" class="btn btn-default">refresh</button>
     </form>
-    <table class="table table-bordered table-hover" style="overflow: scroll; max-height: 600px; overflow-x: hidden">
-      <thead>
-      <tr>
-        <th>server_id</th>
-        <th>role_id</th>
-        <th>money</th>
-        <th>log_date</th>
-        <th>log_time</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr style="cursor: pointer" v-for="item in show_data" @click="toDetail(item.server_id, item.role_id)">
-        <td>{{item.server_id}}</td>
-        <td>{{item.role_id}}</td>
-        <td>{{getMoney(item.money)}}</td>
-        <td>{{item.log_date}}</td>
-        <td>{{getTime(item.log_time)}}</td>
-      </tr>
-      </tbody>
-    </table>
-  </page-template>
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped table-hover">
+        <thead>
+        <tr>
+          <th>#</th>
+          <th>server_id</th>
+          <th>role_id</th>
+          <th>money</th>
+          <th>log_date</th>
+          <th>log_time</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr style="cursor: pointer" v-for="(index, item) in show_data" @click="toDetail(item.role_id)">
+          <td>{{index + 1}}</td>
+          <td>{{item.server_id}}</td>
+          <td>{{item.role_id}}</td>
+          <td>{{getMoney(item.money)}}</td>
+          <td>{{item.log_date}}</td>
+          <td>{{getTime(item.log_time)}}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </new-template>
 </template>
 <script>
-  import XFooter from '../components/footer.vue';
-  import HeaderNav from '../components/header-nav.vue';
-  import PageTemplate from '../components/PageTemplate.vue';
   export default{
+    components: {
+      'new-template': require('../components/PageTemplate.vue')
+    },
     data(){
       return {
         charge_data: [],
-        show_data: [],
+        show_data: null,
         filter: ""
       }
     },
     ready: function () {
       this.onRefresh();
     },
-    components: {
-      PageTemplate
-    },
     methods: {
       onRefresh: function () {
         var _this = this;
         this.show_data = [];
-//        this.$http.get(CHARGE_URL).then(function(response){
-//          _this.charge_data = response.body;
-//          _this.onFilter();
-//        }, function(response){
-//
-//        })
+        console.log("aa");
+        this.$http.get(store.CHARGE_URL).then(function (response) {
+          _this.charge_data = response.body;
+          _this.onFilter();
+        }, function (response) {
+
+        })
       },
       getMoney: function (money) {
         return parseInt(money) / 100;
@@ -101,11 +104,10 @@
           console.log(e);
         }
       },
-      toAccount() {
-        window.location.href = "/account"
-      },
-      toDetail(server_id, role_id) {
-        window.location.href = "/templateIndex?role_id=" + role_id + "&server_id=" + server_id;
+      toDetail: function (role_id) {
+        store.role_id = role_id;
+        console.log(role_id);
+        this.$route.router.go('role')
       }
     }
   }
