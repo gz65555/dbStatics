@@ -11,16 +11,10 @@ export default function (router) {
         require(['./views/Home.vue'], resolve);
       }
     },
-    '/hello': {
-      name: 'hello',
+    '/account': {
+      name: 'account',
       component: function (resolve) {
-        require(['./components/Hello.vue'], resolve);
-      }
-    },
-    '/home': {
-      name: 'home',
-      component:function (resolve) {
-        require(['./views/Home.vue'], resolve);
+        require(['./views/Account.vue'], resolve);
       }
     }
   })
