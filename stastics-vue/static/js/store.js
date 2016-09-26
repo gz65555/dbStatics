@@ -14,6 +14,23 @@ var Store = (function () {
     }
     return Store.instance;
   };
+  Store.prototype.getTimeStamp = function (date) {
+    var arr = date.split('-');
+    var year = arr[0];
+    var month = arr[1];
+    var day = arr[2];
+    var d = new Date();
+    d.setDate(day);
+    d.setYear(year);
+    d.setMonth(month - 1);
+    d.setHours(0);
+    d.setMinutes(0);
+    d.setSeconds(0);
+    var start = Math.floor(d.getTime() / 1000);
+    d.setHours(24);
+    var end = Math.floor(d.getTime() / 1000);
+    return [start, end];
+  };
   return Store;
 }());
 

@@ -1,6 +1,8 @@
 <template>
   <new-template active-index="0">
     <h2 class="sub-header">RoleCharge</h2>
+
+    <date-picker v-ref:datepicker></date-picker>
     <form onsubmit="return false;" class="form-inline" role="form" style="margin-bottom: 20px">
       <div class="form-group">
         <label for="inputPassword2" class="sr-only">Password</label>
@@ -39,7 +41,8 @@
 <script>
   export default{
     components: {
-      'new-template': require('../components/PageTemplate.vue')
+      'new-template': require('../components/PageTemplate.vue'),
+      'date-picker': require('../components/date-picker.vue')
     },
     data(){
       return {
@@ -75,6 +78,7 @@
         return hour + ":" + minutes;
       },
       onTotalCharge: function () {
+        console.log(this.$refs.datepicker.myDate);
         var total = 0;
         this.show_data.forEach(function (item) {
           total += parseInt(item.money) / 100;
@@ -82,27 +86,47 @@
         alert("total is " + total);
       },
       onFilter() {
+        var filter;
         if (this.filter == "" || this.filter == null) {
-          this.show_data = this.charge_data;
-          return;
+          filter = {};
+        } else {
+          try {
+            filter = JSON.parse(this.filter);
+          }
+          catch (e) {
+            alert("filter error");
+            return console.log(e);
+          }
         }
-        try {
-          var filter = JSON.parse(this.filter);
-          console.log(filter);
-          this.show_data = this.charge_data.filter(function (item) {
-            var condition = true;
-            for (var k in filter) {
-              if (item[k].toString() != filter[k].toString()) {
-                condition = false;
-              }
+        var selected = this.$refs.datepicker.selected;
+        var date = this.$refs.datepicker.myDate;
+        this.show_data = this.charge_data.filter(function (item) {
+          var condition = true;
+          for (var k in filter) {
+            if (item[k].toString() != filter[k].toString()) {
+              condition = false;
             }
-            return condition
-          });
-        }
-        catch (e) {
-          alert("filter error");
-          console.log(e);
-        }
+          }
+          //equal time
+          var times;
+          if (selected == 1) {
+            times = store.getTimeStamp(date);
+            if (item.log_time > times[1] || item.log_time < times[0]) {
+              condition = false;
+            }
+          } else if (selected == 2) {
+            times = store.getTimeStamp(date);
+            if(item.log_time > times[1]) {
+              condition = false;
+            }
+          } else if (selected == 3) {
+            times = store.getTimeStamp(date);
+            if(item.log_time < times[0]) {
+              condition = false;
+            }
+          }
+          return condition
+        });
       },
       toDetail: function (role_id) {
         store.role_id = role_id;
