@@ -35,3 +35,5 @@ var Store = (function () {
 }());
 
 var store = Store.getInstance();
+
+module.exports = store;
