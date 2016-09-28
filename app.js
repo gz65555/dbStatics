@@ -17,11 +17,32 @@ db.on('open', function (err) {
     }
     console.log("open");
 //
-//    var charge_log = db.useDb("charge_log");
-//    var jg_charge = charge_log.collection("jg_charge");
-//    //jg_charge.count({}, function(err, count){
-//    //    console.log(count);
-//    //});
+    var charge_log = db.useDb("gm_log");
+    var collection = charge_log.collection("buy_item");
+    collection.aggregate([
+        {
+            $group: {
+                _id:'$proto_id',
+                charge:{$sum: 1}
+            }
+        },
+        {
+            $sort : {
+                charge : -1
+            }
+        },
+        {
+            $limit: 10
+        }
+    ], function (err, result) {
+        if(err) {
+            return console.log(err);
+        }
+        console.log(result);
+    });
+    //jg_charge.count({}, function(err, count){
+    //    console.log(count);
+    //});
 //
 //    function useOfAggregate() {
 //        jg_charge.aggregate([
@@ -54,31 +75,31 @@ db.on('open', function (err) {
 
 var app = express();
 
-app.all('*', function(req, res, next) {
+app.all('*', function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Content-Type,Content-Length, Authorization, Accept,X-Requested-With");
-    res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
-    res.header("X-Powered-By",' 3.2.1');
-    if(req.method=="OPTIONS") res.send(200);/*让options请求快速返回*/
+    res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+    res.header("X-Powered-By", ' 3.2.1');
+    if (req.method == "OPTIONS") res.send(200);/*让options请求快速返回*/
     else  next();
 });
 
-app.use("/static", express.static(path.join(__dirname, 'static')));
+app.use(express.static(path.join(__dirname, 'stastics-vue', 'dist')));
 app.get("/", function (req, res) {
-    res.sendFile(path.join(__dirname, "index.html"));
+    res.sendFile(path.join(__dirname, "stastics-vue", "dist", "index.html"));
 });
 
-app.get('/account', function (req, res) {
-    res.sendFile(path.join(__dirname, "account.html"));
-});
-
-app.get('/role', function (req, res) {
-    res.sendFile(path.join(__dirname, "role.html"));
-});
-
-app.get('/templateIndex', function (req, res) {
-    res.sendFile(path.join(__dirname, "templateIndex.html"));
-});
+// app.get('/account', function (req, res) {
+//     res.sendFile(path.join(__dirname, "account.html"));
+// });
+//
+// app.get('/role', function (req, res) {
+//     res.sendFile(path.join(__dirname, "role.html"));
+// });
+//
+// app.get('/templateIndex', function (req, res) {
+//     res.sendFile(path.join(__dirname, "templateIndex.html"));
+// });
 
 
 app.use(bodyParser.json());
@@ -146,7 +167,7 @@ app.post('/api/role_detail', function (req, res, next) {
             role_data['create_city'] = city;
 
             collection = dbx.collection("role_charge");
-            collection.find({role_id: role_id.toString()}, ["rmb","log_time"], function (err, charges) {
+            collection.find({role_id: role_id.toString()}, ["rmb", "log_time"], function (err, charges) {
                 if (err) {
                     next(err);
                 }
@@ -156,13 +177,41 @@ app.post('/api/role_detail', function (req, res, next) {
                     charge_logs.push(charge_i);
                 }, function () {
                     role_data['charges'] = charge_logs;
-                    console.log(charge_logs);
                     res.json(role_data);
                 });
             });
             //res.json(role_data);
         });
     });
+});
+
+app.post('/api/online_count', function (req, res, next) {
+    var date = req.body.date;
+    var server_id = req.body.server_id;
+    if (!date) {
+        return next();
+    }
+    var dbx = db.useDb('gm_log');
+    var collection = dbx.collection("online_count");
+    var data = [];
+    collection.find({date_time: new RegExp(date), server_id: parseInt(server_id)}, {
+        "count": 1,
+        "log_time": 1,
+        "_id": 0
+    }, function (err, items) {
+        if (err) {
+            return next(err);
+        }
+        items.forEach(function (item) {
+            data.push(item);
+        }, function () {
+            res.json(data);
+        })
+    })
+});
+
+app.post('/api/charge_top', function (req, res, next) {
+
 });
 
 app.listen(8800);

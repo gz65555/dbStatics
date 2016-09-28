@@ -18,7 +18,7 @@
       }
     },
     ready: function () {
-      this.myDate = (new Date()).toLocaleDateString().replace(/\//g, '-');
+      this.myDate = store.getCurrentFormatDate();
     }
   }
 </script>

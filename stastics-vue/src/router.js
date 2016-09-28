@@ -22,6 +22,12 @@ export default function (router) {
       component: function (resolve) {
         require(['./views/Role.vue'], resolve);
       }
+    },
+    '/online-count': {
+      name: 'online_count',
+      component: function(resolve) {
+        require(['./views/OnlineCount.vue'], resolve);
+      }
     }
   })
 }

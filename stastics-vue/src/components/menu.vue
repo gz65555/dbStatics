@@ -15,7 +15,7 @@
   export default{
     data(){
       return {
-        list1:["RoleCharge", "Account"]
+        list1:["RoleCharge", "Account", "OnlineCount"]
       }
     },
     props:["activeIndex"],
@@ -28,6 +28,8 @@
           this.$route.router.go('/');
         } else if(index == 1) {
           this.$route.router.go('/account');
+        } else if(index == 2) {
+          this.$route.router.go('/online-count');
         }
       }
     },
