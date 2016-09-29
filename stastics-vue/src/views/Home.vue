@@ -3,6 +3,17 @@
     <h2 class="sub-header">RoleCharge</h2>
 
     <date-picker v-ref:datepicker></date-picker>
+    <form onsubmit="return false" class="form-inline" style="margin-bottom: 20px">
+      <div class="form-group">
+        <label>platform</label>
+        <select @change="onPlatformChange" class="form-control" v-model="platform">
+          <option value="0">9g</option>
+          <option value="1">wechat</option>
+          <option value="2">egret</option>
+        </select>
+        <button @click="onRefresh" class="btn btn-default">refresh</button>
+      </div>
+    </form>
     <form onsubmit="return false;" class="form-inline" role="form" style="margin-bottom: 20px">
       <div class="form-group">
         <label for="inputPassword2" class="sr-only">Password</label>
@@ -10,7 +21,6 @@
       </div>
       <button @click="onFilter" class="btn btn-default">filter</button>
       <button @click="onTotalCharge" class="btn btn-default">ChargeTotal</button>
-      <button @click="onRefresh" class="btn btn-default">refresh</button>
     </form>
     <div class="table-responsive">
       <table class="table table-bordered table-striped table-hover">
@@ -48,7 +58,9 @@
       return {
         charge_data: [],
         show_data: null,
-        filter: ""
+        filter: "",
+        platform: 0,
+        total_data: []
       }
     },
     ready: function () {
@@ -58,27 +70,32 @@
       onRefresh: function () {
         var _this = this;
         this.show_data = [];
-        console.log("aa");
-        this.$http.get(store.CHARGE_URL).then(function (response) {
-          _this.charge_data = response.body;
-          _this.onFilter();
-        }, function (response) {
-
-        })
+        requestData(this.platform);
+        function requestData(platform) {
+          console.log(platform);
+          _this.$http.get(store.CHARGE_URL, {platform: platform}).then(function (response) {
+            _this.total_data[parseInt(platform)] = response.body;
+            _this.charge_data = _this.total_data[parseInt(platform)];
+            _this.onFilter();
+          })
+        }
+      },
+      onPlatformChange: function () {
+        var platform = this.platform;
+        if (!this.total_data[parseInt(platform)]) {
+          this.onRefresh();
+        } else {
+          this.charge_data = this.total_data[parseInt(platform)];
+          this.onFilter();
+        }
       },
       getMoney: function (money) {
         return parseInt(money) / 100;
       },
       getTime: function (time) {
-        var date = new Date(time * 1000);
-        var hour = date.getHours();
-        hour = hour < 10 ? "0" + hour : hour.toString();
-        var minutes = date.getMinutes();
-        minutes = minutes < 10 ? "0" + minutes : minutes.toString();
-        return hour + ":" + minutes;
+        store.formatServerTime(time);
       },
       onTotalCharge: function () {
-        console.log(this.$refs.datepicker.myDate);
         var total = 0;
         this.show_data.forEach(function (item) {
           total += parseInt(item.money) / 100;
@@ -116,12 +133,12 @@
             }
           } else if (selected == 2) {
             times = store.getTimeStamp(date);
-            if(item.log_time > times[1]) {
+            if (item.log_time > times[1]) {
               condition = false;
             }
           } else if (selected == 3) {
             times = store.getTimeStamp(date);
-            if(item.log_time < times[0]) {
+            if (item.log_time < times[0]) {
               condition = false;
             }
           }

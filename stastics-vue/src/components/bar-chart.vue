@@ -14,24 +14,26 @@
   require('echarts/lib/component/title');
 
   export default{
-    data:function() {
-      return {};
+    data: function () {
+      return {
+        _title:""
+      };
     },
-    props:["chart_id"],
-    ready:function () {
+    props: ["chart_id"],
+    ready: function () {
       var myChart = echarts.init(document.getElementById(this.chart_id));
       this.myChart = myChart;
       // 绘制图表
       var option = {
         title: {
-          text: 'Line Graph of Online Count'
+          text: ""
         },
         tooltip: {
           trigger: 'axis'
         },
         legend: {
           show: true,
-          data: ['OnlineCount','test']
+          data: ['count', 'test']
         },
         toolbox: {
           show: true,
@@ -70,30 +72,37 @@
           }
         }],
         series: [{
-          name: 'OnlineCount',
-          type: 'line',
+          name: 'count',
+          type: 'bar',
           data: []
         }]
       };
       myChart.setOption(option);
     },
+    computed: {
+      title: {
+        set: function (v) {
+          console.log('set');
+          this.myChart.setOption({
+            title: {
+              text: v
+            }
+          })
+        }
+      }
+    },
     methods: {
-      draw:function (items) {
-        var times = [];
-        var counts = [];
-        items.forEach(function (item) {
-          times.push(store.formatServerTime(item.log_time));
-          counts.push(item.count);
-        });
+      draw: function (XItems, YItems) {
         this.myChart.setOption({
           xAxis: [{
+            name: XItems.name,
             type: 'category',
-            data: times
+            data: XItems.items
           }],
           series: [{
-            name: '在线人数',
-            type: 'line',
-            data: counts
+            name: YItems.name,
+            type: 'bar',
+            data: YItems.items
           }]
         })
       }

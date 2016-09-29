@@ -17,29 +17,7 @@ db.on('open', function (err) {
     }
     console.log("open");
 //
-    var charge_log = db.useDb("gm_log");
-    var collection = charge_log.collection("buy_item");
-    collection.aggregate([
-        {
-            $group: {
-                _id:'$proto_id',
-                charge:{$sum: 1}
-            }
-        },
-        {
-            $sort : {
-                charge : -1
-            }
-        },
-        {
-            $limit: 10
-        }
-    ], function (err, result) {
-        if(err) {
-            return console.log(err);
-        }
-        console.log(result);
-    });
+
     //jg_charge.count({}, function(err, count){
     //    console.log(count);
     //});
@@ -104,8 +82,17 @@ app.get("/", function (req, res) {
 
 app.use(bodyParser.json());
 app.get('/api/jg-charge', function (req, res, next) {
+    var platform = parseInt(req.body.platform);
     var charge_log = db.useDb('charge_log');
-    var jg_charge = charge_log.collection("jg_charge");
+    var logName = "jg_charge";
+    // if(platform === 0) {
+    //     logName = "jg_charge";
+    // } else if(platform === 1) {
+    //     logName = "egret_charge";
+    // } else if(platform === 2) {
+    //     logName = "charge_notify";
+    // }
+    var jg_charge = charge_log.collection(logName);
     jg_charge.find({}, {_id: 0}, function (err, items) {
         if (err) {
             next(err);
@@ -211,7 +198,30 @@ app.post('/api/online_count', function (req, res, next) {
 });
 
 app.post('/api/charge_top', function (req, res, next) {
-
+    var type = req.body.type;
+    var charge_log = db.useDb("gm_log");
+    var collection = charge_log.collection("buy_item");
+    collection.aggregate([
+        {
+            $group: {
+                _id:'$proto_id',
+                count:{$sum: 1}
+            }
+        },
+        {
+            $sort : {
+                charge : -1
+            }
+        },
+        {
+            $limit: 10
+        }
+    ], function (err, result) {
+        if(err) {
+            return next(err);
+        }
+        res.json(result);
+    });
 });
 
 app.listen(8800);

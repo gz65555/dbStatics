@@ -7,6 +7,7 @@ var Store = (function () {
     this.ACCOUNT_URL = "http://192.168.1.14:8800/api/account-info";
     this.ROLE_URL = "http://192.168.1.14:8800/api/role_detail";
     this.ONLINE_URL = "http://192.168.1.14:8800/api/online_count";
+    this.TOP10_URL = "http://192.168.1.14:8800/api/charge_top";
     this.role_id = null;
   }
   Store.getInstance = function () {

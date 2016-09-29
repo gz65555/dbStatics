@@ -23,6 +23,12 @@ export default function (router) {
         require(['./views/Role.vue'], resolve);
       }
     },
+    '/top10': {
+      name: 'top10',
+      component: function (resolve) {
+        require(['./views/Top10.vue'], resolve);
+      }
+    },
     '/online-count': {
       name: 'online_count',
       component: function(resolve) {
