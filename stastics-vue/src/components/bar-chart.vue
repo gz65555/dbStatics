@@ -92,17 +92,17 @@
       }
     },
     methods: {
-      draw: function (XItems, YItems) {
+      draw: function (data) {
         this.myChart.setOption({
           xAxis: [{
-            name: XItems.name,
+            name: "itemName",
             type: 'category',
-            data: XItems.items
+            data: data.XItems
           }],
           series: [{
-            name: YItems.name,
+            name: "count",
             type: 'bar',
-            data: YItems.items
+            data: data.YItems
           }]
         })
       }

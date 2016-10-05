@@ -3,11 +3,13 @@
  */
 var Store = (function () {
   function Store() {
-    this.CHARGE_URL = "http://192.168.1.14:8800/api/jg-charge";
-    this.ACCOUNT_URL = "http://192.168.1.14:8800/api/account-info";
-    this.ROLE_URL = "http://192.168.1.14:8800/api/role_detail";
-    this.ONLINE_URL = "http://192.168.1.14:8800/api/online_count";
-    this.TOP10_URL = "http://192.168.1.14:8800/api/charge_top";
+    var url = "http://127.0.0.1";
+    this.CHARGE_URL = url + ":8800/api/jg-charge";
+    this.ACCOUNT_URL = url + ":8800/api/account-info";
+    this.ROLE_URL = url + ":8800/api/role_detail";
+    this.ONLINE_URL = url + ":8800/api/online_count";
+    this.TOP10_URL = url + ":8800/api/charge_top";
+    this.AWARD = url + ":8800/api/send-award";
     this.role_id = null;
   }
   Store.getInstance = function () {

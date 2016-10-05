@@ -34,7 +34,7 @@ function sendToUrl(gm_url, data_list) {
     data_list['sign'] = md5(no_md5).toUpperCase();
     // console.log(data_list['sign']);
     request.post({url: gm_url, form: data_list}, function (err, res, body) {
-        // console.log(body);
+         console.log(body);
     });
 }
 
@@ -92,13 +92,14 @@ db.on('open', function (err) {
     console.log("open");
 });
 function send(results) {
-    // console.log(results);
+     console.log(results);
     var awards = [];
     awards.push({"key": COIN, "value": 8888888});
     awards.push({"key": PRESTIGE, "value": 888});
     awards.push({"key": HONOR, "value": 88});
     results.forEach(function (item) {
         var role_id = parseInt(item._id);
+        //console.log(role_id);
         sendAward(role_id, awards);
     })
 }

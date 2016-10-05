@@ -6,6 +6,7 @@ var mongoose = require('mongoose');
 var path = require("path");
 var settings = require('./settings');
 var bodyParser = require('body-parser');
+var award = require('./sendAward');
 
 var uri = "mongodb://{user}:{pass}@60.205.168.192:27017/admin";
 uri = uri.replace('{user}', settings.user).replace("{pass}", settings.pass);
@@ -58,7 +59,7 @@ app.all('*', function (req, res, next) {
     res.header("Access-Control-Allow-Headers", "Content-Type,Content-Length, Authorization, Accept,X-Requested-With");
     res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
     res.header("X-Powered-By", ' 3.2.1');
-    if (req.method == "OPTIONS") res.send(200);/*让options请求快速返回*/
+    if (req.method == "OPTIONS") res.sendStatus(200);/*让options请求快速返回*/
     else  next();
 });
 
@@ -200,27 +201,55 @@ app.post('/api/online_count', function (req, res, next) {
 app.post('/api/charge_top', function (req, res, next) {
     var type = req.body.type;
     var charge_log = db.useDb("gm_log");
-    var collection = charge_log.collection("buy_item");
+    var match = {};
+    var groupId = "$proto_id";
+    var c_name = "buy_item";
+    if(type == 0) {
+    } else if(type == 1) {
+        match = {coin: { $gt: 1}}
+    } else if(type == 2) {
+        match = {gold: { $gt: 1}}
+    } else if(type == 3) {
+        c_name = "sub_gold";
+        groupId = "$reason";
+    }
+    var collection = charge_log.collection(c_name);
     collection.aggregate([
         {
+            $match: match
+        },
+        {
             $group: {
-                _id:'$proto_id',
-                count:{$sum: 1}
+                _id: groupId,
+                count: {$sum: 1}
             }
         },
         {
-            $sort : {
-                charge : -1
+            $sort: {
+                count: -1
             }
         },
         {
             $limit: 10
         }
     ], function (err, result) {
-        if(err) {
+        if (err) {
             return next(err);
         }
         res.json(result);
+    });
+});
+
+app.post("/api/send-award", function(req, res, next) {
+    var role_id = req.body.role_id;
+    var type = req.body.type;
+    var value = req.body.value;
+    award.sendAwardByKey(role_id, type, value, function(body) {
+        if(body == "success") {
+            res.json({result: 1});
+        } else {
+            res.json({result: 0});
+        }
     });
 });
 

@@ -27,6 +27,17 @@
         </tbody>
       </table>
 
+      <form onsubmit="return false" class="form-inline" style="margin-bottom: 20px">
+        <div class="form-group">
+          <label>award</label>
+          <select class="form-control" v-model="type">
+            <option v-for="(index, item) in options" :value="index">{{item}}</option>
+          </select>
+          <input class="form-control" type="number" v-model="value">
+          <button @click="onSend" class="btn btn-default">send</button>
+        </div>
+      </form>
+
       <table class="table table-bordered table-striped">
         <caption>create city</caption>
         <thead>
@@ -64,26 +75,46 @@
   export default{
     data: function () {
       return {
-        role_data: null
+        options: ["coin", "exp", "gold", "prestige", "honor", "army_token", "equip_fragment", "hero_soul"],
+        role_data: null,
+        type: 0,
+        value: 0,
+        role_id: 3275
       }
     },
     components: {
       "page-template": require('../components/PageTemplate.vue')
     },
     ready: function () {
+      this.role_id = this.$route.params.role_id;
       this.onRefresh();
     },
     methods: {
+      onSend: function() {
+        console.log(this.role_id);
+        console.log(this.type);
+        console.log(this.value);
+        this.$http.post(store.AWARD, {role_id: this.role_id, type: (this.type + 1), value: this.value}).then(function (response) {
+          if(response.body.result == 1) {
+            alert('success');
+          } else {
+            alert('fail');
+          }
+        }, function (response) {
+          alert('fail');
+        })
+      },
       onRefresh: function () {
         var _this = this;
-        var role_id = store.role_id;
+        var role_id = this.role_id;
         if (role_id == null) {
           return;
         }
         this.role_data = null;
         this.$http.post(store.ROLE_URL, {role_id: role_id}).then(function (response) {
-          _this.role_data = response.body;
-          console.log(response.body)
+          if(response.body.role) {
+            _this.role_data = response.body;
+          }
         }, function (response) {
 
         })

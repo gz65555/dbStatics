@@ -24,26 +24,34 @@
     },
     methods: {
       onChange:function() {
-        console.log(this.selected);
+        var postTop10 = (type)=> {
+          this.$http.post(store.TOP10_URL, {type:type}).then((response)=> {
+//            response.body.sort(function(a, b){
+//              return b.count - a.count;
+//            });
+            var items = {XItems:[], YItems:[]};
+            response.body.forEach(function(item) {
+              items.YItems.push(item.count);
+              items.XItems.push(item._id);
+            });
+            data[type] = items;
+            this.$refs.chart1.draw(items);
+          })
+        }
         this.title = this.options[this.selected];
         this.$refs.chart1.title = this.title;
+        var data = this.data;
         if(!data[this.selected]) {
-
+          postTop10(this.selected);
         } else {
-
-        }
-
-        postTop10 = (type)=> {
-          this.$http.post(store.TOP10_URL, {type:type}).then(function (response) {
-            data[type] = response.body;
-            
-          })
+          this.$refs.chart1.draw(data[this.selected]);
         }
       }
     },
     ready: function(){
       this.title = this.options[this.selected];
       this.$refs.chart1.title = this.title;
+      this.onChange();
     },
     components: {
       'new-template': require('../components/PageTemplate'),

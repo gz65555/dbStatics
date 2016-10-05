@@ -125,7 +125,7 @@
       toDetail(role_id) {
         store.role_id = role_id;
         console.log(role_id);
-        this.$route.router.go('role')
+        this.$route.router.go('role/' + role_id);
       }
     }
   }

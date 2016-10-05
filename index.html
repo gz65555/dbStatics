@@ -38,6 +38,7 @@
                 <table class="table table-bordered table-hover">
                     <thead>
                     <tr>
+                        <th>index</th>
                         <th>server_id</th>
                         <th>role_id</th>
                         <th>money</th>
@@ -46,7 +47,8 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr style="cursor: pointer" v-for="item in show_data" @click="toDetail(item.server_id, item.role_id)">
+                    <tr style="cursor: pointer" v-for="(index, item) in show_data" @click="toDetail(item.server_id, item.role_id)">
+                        <td>{{index + 1}}</td>
                         <td>{{item.server_id}}</td>
                         <td>{{item.role_id}}</td>
                         <td>{{getMoney(item.money)}}</td>
