@@ -36,10 +36,6 @@ var OnlineDb = (function () {
             this.isConnecting = false;
             console.log("close");
         }.bind(this));
-
-        setTimeout(function () {
-            db.close();
-        },10000)
     };
     return OnlineDb;
 }());
