@@ -3,13 +3,11 @@
  */
 var Store = (function () {
   function Store() {
-    var url = "http://192.168.1.9";
-    this.CHARGE_URL = url + ":8800/api/jg-charge";
-    this.ACCOUNT_URL = url + ":8800/api/account-info";
-    this.ROLE_URL = url + ":8800/api/role_detail";
-    this.ONLINE_URL = url + ":8800/api/online_count";
-    this.TOP10_URL = url + ":8800/api/charge_top";
-    this.AWARD = url + ":8800/api/send-award";
+    this.CHARGE_URL = "http://192.168.1.14:8800/api/jg-charge";
+    this.ACCOUNT_URL = "http://192.168.1.14:8800/api/account-info";
+    this.ROLE_URL = "http://192.168.1.14:8800/api/role_detail";
+    this.ONLINE_URL = "http://192.168.1.14:8800/api/online_count";
+    this.TOP10_URL = "http://192.168.1.14:8800/api/charge_top";
     this.role_id = null;
   }
   Store.getInstance = function () {
@@ -55,17 +53,6 @@ var Store = (function () {
     var minutes = date.getMinutes();
     minutes = minutes < 10 ? "0" + minutes : minutes.toString();
     return hour + ":" + minutes;
-  };
-  Store.prototype.formatFullTime = function (time) {
-    var date = new Date(time * 1000);
-    var hour = date.getHours();
-    var year = date.getFullYear();
-    var month = date.getMonth() + 1;
-    var day = date.getDate();
-    hour = hour < 10 ? "0" + hour : hour.toString();
-    var minutes = date.getMinutes();
-    minutes = minutes < 10 ? "0" + minutes : minutes.toString();
-    return year + '-' + month + '-' + day + "  " + hour + ":" + minutes;
   };
   return Store;
 }());

@@ -29,9 +29,8 @@
           <th>#</th>
           <th>server_id</th>
           <th>role_id</th>
-          <th>name</th>
-          <th>rmb</th>
-          <th>platform</th>
+          <th>money</th>
+          <th>log_date</th>
           <th>log_time</th>
         </tr>
         </thead>
@@ -40,9 +39,8 @@
           <td>{{index + 1}}</td>
           <td>{{item.server_id}}</td>
           <td>{{item.role_id}}</td>
-          <td>{{item.name}}</td>
-          <td>{{item.rmb}}</td>
-          <td>{{item.platform}}</td>
+          <td>{{getMoney(item.money)}}</td>
+          <td>{{item.log_date}}</td>
           <td>{{getTime(item.log_time)}}</td>
         </tr>
         </tbody>
@@ -76,7 +74,6 @@
         function requestData(platform) {
           console.log(platform);
           _this.$http.get(store.CHARGE_URL, {platform: platform}).then(function (response) {
-            console.log(response.body);
             _this.total_data[parseInt(platform)] = response.body;
             _this.charge_data = _this.total_data[parseInt(platform)];
             _this.onFilter();
@@ -84,25 +81,24 @@
         }
       },
       onPlatformChange: function () {
-        if(this.platform == '0') {
-          this.filter = '{"platform":"9g"}';
-        } else if(this.platform == '1') {
-          this.filter = '{"platform":"weixin"}';
-        } else if(this.platform == '2') {
-          this.filter = '{"platform":"egret"}';
+        var platform = this.platform;
+        if (!this.total_data[parseInt(platform)]) {
+          this.onRefresh();
+        } else {
+          this.charge_data = this.total_data[parseInt(platform)];
+          this.onFilter();
         }
-        this.onFilter();
       },
       getMoney: function (money) {
         return parseInt(money) / 100;
       },
       getTime: function (time) {
-        return store.formatFullTime(time);
+        store.formatServerTime(time);
       },
       onTotalCharge: function () {
         var total = 0;
         this.show_data.forEach(function (item) {
-          total += parseInt(item.rmb);
+          total += parseInt(item.money) / 100;
         });
         alert("total is " + total);
       },
@@ -124,10 +120,6 @@
         this.show_data = this.charge_data.filter(function (item) {
           var condition = true;
           for (var k in filter) {
-            if(item[k] == null || filter[k] == null) {
-              condition = false;
-              continue;
-            }
             if (item[k].toString() != filter[k].toString()) {
               condition = false;
             }
@@ -156,7 +148,7 @@
       toDetail: function (role_id) {
         store.role_id = role_id;
         console.log(role_id);
-        this.$route.router.go('role/' + role_id);
+        this.$route.router.go('role')
       }
     }
   }

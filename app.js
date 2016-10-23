@@ -4,53 +4,15 @@
 var express = require('express');
 var mongoose = require('mongoose');
 var path = require("path");
-var settings = require('./settings');
 var bodyParser = require('body-parser');
 var award = require('./sendAward');
-
-var uri = "mongodb://{user}:{pass}@60.205.168.192:27017/admin";
-uri = uri.replace('{user}', settings.user).replace("{pass}", settings.pass);
-var db = mongoose.createConnection(uri);
-db.on('open', function (err) {
-    if (err) {
+var myDb = require('./onlineDb');
+myDb.connect(function (err) {
+    if(err) {
         console.log(err);
-        return;
     }
-    console.log("open");
-//
-
-    //jg_charge.count({}, function(err, count){
-    //    console.log(count);
-    //});
-//
-//    function useOfAggregate() {
-//        jg_charge.aggregate([
-//            {
-//                $group: {
-//                    _id: '$log_date',  //$region is the column name in collection
-//                    count: {$sum: '$log_time'}
-//                }
-//            }
-//        ], function (err, result) {
-//            if (err) {
-//                return console.log(err);
-//            }
-//
-//            console.log(result);
-//        });
-//    }
-//
-//
-//    jg_charge.find({}).exec(function(err, items) {
-//       items.forEach(function(item){
-//
-//       })
-//    });
-//
-//    db.close();
-//    //charge_log.execCommand();
-//    //jg_charge.mapReduce()
 });
+var db = myDb.db;
 
 var app = express();
 
@@ -68,31 +30,24 @@ app.get("/", function (req, res) {
     res.sendFile(path.join(__dirname, "stastics-vue", "dist", "index.html"));
 });
 
-// app.get('/account', function (req, res) {
-//     res.sendFile(path.join(__dirname, "account.html"));
-// });
-//
-// app.get('/role', function (req, res) {
-//     res.sendFile(path.join(__dirname, "role.html"));
-// });
-//
-// app.get('/templateIndex', function (req, res) {
-//     res.sendFile(path.join(__dirname, "templateIndex.html"));
-// });
-
+app.use(function (req, res, next) {
+    if(!myDb.isConnecting) {
+        myDb.connect(function (err) {
+            if(err) {
+                return next(err);
+            }
+            next();
+        });
+        db = myDb.db;
+    } else {
+        next();
+    }
+});
 
 app.use(bodyParser.json());
 app.get('/api/jg-charge', function (req, res, next) {
-    var platform = parseInt(req.body.platform);
-    var charge_log = db.useDb('charge_log');
-    var logName = "jg_charge";
-    // if(platform === 0) {
-    //     logName = "jg_charge";
-    // } else if(platform === 1) {
-    //     logName = "egret_charge";
-    // } else if(platform === 2) {
-    //     logName = "charge_notify";
-    // }
+    var charge_log = db.useDb('gm_log');
+    var logName = "role_charge";
     var jg_charge = charge_log.collection(logName);
     jg_charge.find({}, {_id: 0}, function (err, items) {
         if (err) {
