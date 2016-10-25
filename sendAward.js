@@ -32,13 +32,14 @@ function sendToUrl(gm_url, data_list, callback) {
     no_md5 += settings.secret;
     data_list['sign'] = md5(no_md5).toUpperCase();
     // console.log(data_list['sign']);
+    console.log(data_list['sign']);
     request.post({url: gm_url, form: data_list}, function (err, res, body) {
         if(err) {
             callback(err);
         } else {
             callback(body);
         }
-        //console.log(body);
+        console.log(body);
     });
 }
 
